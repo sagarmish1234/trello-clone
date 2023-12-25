@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-export const BoardCreateSchema = z.object({
+export const BoardSchema = z.object({
   name: z.string(),
 });
 
-export type BoardCreateSchemaType = z.infer<typeof BoardCreateSchema>;
+export type BoardCreateSchemaType = z.infer<typeof BoardSchema>;

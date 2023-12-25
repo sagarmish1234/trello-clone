@@ -6,6 +6,8 @@ export const CARD = "/card";
 export const COMMMENT = "/comment";
 export const CHECKLISTITEM = "/checklistItem";
 export const LOGIN = "/login";
+export const NAME = "/name";
+export const ID = "/:id";
 
 export const CREATE = "/create";
 export const GET = "/get";
