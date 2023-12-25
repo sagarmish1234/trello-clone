@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  password    String
+  firstName   String
+  lastName    String
+  signupDate  DateTime  @default(now())
+  boards      Board[]   @relation(name: "member_relation")
+  ownerBoards Board[]   @relation(name: "owner_relation")
+  boardIds    String[]
+  cards       Card[]
+  Comment     Comment[]
+}
+
+model Board {
+  id         String   @id @default(uuid())
+  owner      User     @relation(fields: [ownerId], references: [id], name: "owner_relation")
+  ownerId    String
+  name       String
+  createDate DateTime @default(now())
+  members    User[]   @relation(name: "member_relation")
+  lists      List[]
+}
+
+model List {
+  id       String @id @default(uuid())
+  name     String
+  board    Board  @relation(fields: [boardId], references: [id])
+  boardId  String
+  position String
+  Card     Card[]
+}
+
+model Card {
+  id            String          @id @default(uuid())
+  name          String
+  description   String
+  createDate    DateTime        @default(now())
+  dueDate       DateTime?
+  reminderDate  DateTime?
+  members       User[]
+  comment       Comment[]
+  position      String
+  listId        String
+  list          List            @relation(fields: [listId], references: [id])
+  ChecklistItem ChecklistItem[]
+}
+
+model Comment {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  cardId     String
+  card       Card     @relation(fields: [cardId], references: [id])
+  comment    String
+  createDate DateTime @default(now())
+}
+
+model ChecklistItem {
+  id        String  @id @default(uuid())
+  name      String
+  isChecked Boolean @default(false)
+  position  String
+  cardId    String
+  card      Card    @relation(fields: [cardId], references: [id])
+}
