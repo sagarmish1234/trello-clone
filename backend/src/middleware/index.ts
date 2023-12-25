@@ -1,12 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "../util/jwt";
 import status, { UNAUTHORIZED } from "http-status";
-import { UserClaims } from "../types/user";
-import { JwtPayload } from "jsonwebtoken";
-
-interface CustomRequest extends Request {
-  claims: JwtPayload | string;
-}
+import { CustomRequest } from "../types/common";
 
 //TODO: Middleware to authenticate requests using JWT
 export const authenticateToken = (
@@ -14,12 +9,10 @@ export const authenticateToken = (
   res: Response,
   next: NextFunction,
 ) => {
-  // Get the token from the Authorization header
+  //TODO: Get the token from the Authorization header
   const token = req.headers.authorization?.slice(7);
   if (!token) {
-    return res
-      .status(401)
-      .json({ message: "Unauthorized: Token not provided" });
+    return res.status(UNAUTHORIZED).json({ message: status[UNAUTHORIZED] });
   }
 
   //TODO: Verify the token
@@ -33,8 +26,8 @@ export const authenticateToken = (
       .status(UNAUTHORIZED)
       .json({ status: UNAUTHORIZED, message: status[UNAUTHORIZED] });
   }
-  // Attach the decoded payload to the request for further use
+  //TODO: Attach the decoded payload to the request for further use
   (req as CustomRequest).claims = claims;
-  // Proceed to the next middleware or route handler
+  //TODO: Proceed to the next middleware or route handler
   next();
 };
