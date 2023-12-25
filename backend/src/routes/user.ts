@@ -28,6 +28,7 @@ router.post(CREATE, async (req: Request, res: Response): Promise<void> => {
       },
     });
     console.log(user);
+    res.status(200).json({ status: 200, message: "Request success" });
   } catch (err) {
     if (error instanceof ZodError) {
       console.error("Validation error:", error.errors);
@@ -36,14 +37,13 @@ router.post(CREATE, async (req: Request, res: Response): Promise<void> => {
         message: "Validation error",
       });
     } else {
-      console.error("Unexpected error:", error);
+      console.log("Unexpected error:", error);
       res.status(500).json({
         status: 500,
         message: "Internal server error",
       });
     }
   }
-  res.status(200).json({ status: 200, message: "Request success" });
 });
 
 //TODO: API for generating the json token for authentication
@@ -63,12 +63,15 @@ router.post(LOGIN, async (req: Request, res: Response) => {
         password: true,
       },
     });
+    console.log(user);
     let token;
     if (
       user != null &&
       (await isPasswordMaching(user.password, userLoginRequest.password))
     ) {
+      console.log("Reached here");
       token = generateToken(user as UserClaims);
+      console.log("After reached here")
       res
         .status(200)
         .json({ status: 200, token, claims: UserClaimsSchema.parse(user) });
@@ -83,7 +86,7 @@ router.post(LOGIN, async (req: Request, res: Response) => {
         message: "Validation error",
       });
     } else {
-      console.error("Unexpected error:", error);
+      console.log(error);
       res.status(500).json({
         status: 500,
         message: "Internal server error",
