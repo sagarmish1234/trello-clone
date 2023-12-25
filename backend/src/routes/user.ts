@@ -69,9 +69,7 @@ router.post(LOGIN, async (req: Request, res: Response) => {
       user != null &&
       (await isPasswordMaching(user.password, userLoginRequest.password))
     ) {
-      console.log("Reached here");
       token = generateToken(user as UserClaims);
-      console.log("After reached here")
       res
         .status(200)
         .json({ status: 200, token, claims: UserClaimsSchema.parse(user) });
