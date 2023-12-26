@@ -1,9 +1,22 @@
 import { z } from "zod";
 
-export const ChecklistItemSchema = z.object({
+export const ChecklistItemCreateSchema = z.object({
   name: z.string(),
   cardId: z.string(),
-  postition: z.number(),
+  position: z.number(),
 });
 
-export type ChecklistItemSchemaType = z.infer<typeof ChecklistItemSchema>;
+export const ChecklistItemUpdateSchema = z
+  .object({
+    name: z.string(),
+    position: z.number(),
+    isChecked: z.boolean(),
+  })
+  .partial();
+
+export type ChecklistItemCreateSchemaType = z.infer<
+  typeof ChecklistItemCreateSchema
+>;
+export type ChecklistItemUpdateSchemaType = z.infer<
+  typeof ChecklistItemUpdateSchema
+>;
