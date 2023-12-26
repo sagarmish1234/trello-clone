@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 import prisma from "../db";
-import { CREATE, GET, ID, ME, NAME, UPDATE } from "../constant";
+import { CREATE, GET, ID, ME, UPDATE } from "../constant";
 import { ZodError } from "zod";
 import status, {
   BAD_REQUEST,
@@ -63,6 +63,11 @@ router.get(ID, async (req: Request, res: Response) => {
             email: true,
           },
         },
+        lists: {
+          include: {
+            cards: true,
+          },
+        },
       },
     });
     res.status(OK).json({ status: OK, board: board });
@@ -115,7 +120,7 @@ router.put(ID + UPDATE, async (req: Request, res: Response) => {
   try {
     const boardId = req.params.id;
     const boardUpdateNameRequest = BoardSchema.parse(req.body);
-    const board = await prisma.board.update({
+    await prisma.board.update({
       where: {
         id: boardId,
       },

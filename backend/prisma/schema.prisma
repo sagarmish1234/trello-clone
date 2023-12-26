@@ -38,8 +38,8 @@ model List {
   name     String
   board    Board  @relation(fields: [boardId], references: [id])
   boardId  String
-  position String
-  Card     Card[]
+  position Int
+  cards    Card[]
 }
 
 model Card {
@@ -51,7 +51,7 @@ model Card {
   reminderDate  DateTime?
   members       User[]
   comment       Comment[]
-  position      String
+  position      Int
   listId        String
   list          List            @relation(fields: [listId], references: [id])
   ChecklistItem ChecklistItem[]
@@ -71,7 +71,7 @@ model ChecklistItem {
   id        String  @id @default(uuid())
   name      String
   isChecked Boolean @default(false)
-  position  String
+  position  Int
   cardId    String
   card      Card    @relation(fields: [cardId], references: [id])
 }
