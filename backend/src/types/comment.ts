@@ -5,4 +5,9 @@ export const CommentCreateSchema = z.object({
   cardId: z.string(),
 });
 
+export const CommentUpdateSchema = z.object({
+  comment: z.string(),
+});
+
 export type CommentCreateSchemaType = z.infer<typeof CommentCreateSchema>;
+export type CommentUpdateSchemaType = z.infer<typeof CommentUpdateSchema>;

@@ -1,5 +1,5 @@
-import { JwtPayload } from "jsonwebtoken";
 import { Request } from "express";
+import { JwtPayload } from "jsonwebtoken";
 
 export type ApiResponse = {
   status: Number;
