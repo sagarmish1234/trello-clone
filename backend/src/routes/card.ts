@@ -1,14 +1,5 @@
 import { Request, Response, Router } from "express";
-import {
-  ADD,
-  CREATE,
-  GET,
-  ID,
-  MEMBER,
-  MEMBERS,
-  REMOVE,
-  UPDATE,
-} from "../constant";
+import { ADD, CREATE, GET, ID, MEMBER, REMOVE, UPDATE } from "../constant";
 import { ZodError } from "zod";
 import status, {
   BAD_REQUEST,
@@ -133,7 +124,7 @@ router.put(ID + UPDATE, async (req: Request, res: Response) => {
   }
 });
 
-//TODO: api for updating card member
+//TODO: api for adding card member
 router.put(ID + ADD + MEMBER, async (req: Request, res: Response) => {
   try {
     const member = CardMemberUpdateSchema.parse(req.body).member;
