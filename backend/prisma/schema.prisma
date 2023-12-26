@@ -45,7 +45,7 @@ model List {
 model Card {
   id            String          @id @default(uuid())
   name          String
-  description   String
+  description   String?
   createDate    DateTime        @default(now())
   dueDate       DateTime?
   reminderDate  DateTime?

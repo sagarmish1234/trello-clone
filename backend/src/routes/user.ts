@@ -1,6 +1,6 @@
 import { Router } from "express";
 import prisma from "../db";
-import { CREATE, LOGIN, ME } from "../constant";
+import { ALL, CREATE, LOGIN, ME } from "../constant";
 import {
   UserClaims,
   UserClaimsSchema,
@@ -102,6 +102,35 @@ router.get(ME, authenticateToken, async (req: Request, res: Response) => {
   res
     .status(OK)
     .json({ status: status[OK], claims: UserClaimsSchema.parse(claims) });
+});
+
+//TODO: api to get all the users of the users orgnizaition - FOR CURRENT SCENARIO WE ARE GETTING ALL THE USERS
+router.get(ALL, async (req: Request, res: Response) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+      },
+    });
+    res.status(OK).json({ status: OK, message: status[OK], users });
+  } catch (err) {
+    if (error instanceof ZodError) {
+      console.error("Validation error:", error.errors);
+      res.status(400).json({
+        status: 400,
+        message: "Validation error",
+      });
+    } else {
+      console.log(error);
+      res.status(INTERNAL_SERVER_ERROR).json({
+        status: INTERNAL_SERVER_ERROR,
+        message: status[INTERNAL_SERVER_ERROR],
+      });
+    }
+  }
 });
 
 export default router;

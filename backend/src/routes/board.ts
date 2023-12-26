@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 import prisma from "../db";
-import { CREATE, GET, ID, ME, UPDATE } from "../constant";
+import { CREATE, GET, ID, ME, MEMBERS, UPDATE } from "../constant";
 import { ZodError } from "zod";
 import status, {
   BAD_REQUEST,
@@ -115,7 +115,7 @@ router.get(ME + GET, async (req: Request, res: Response) => {
   }
 });
 
-//TODO: api for updating the board name
+//TODO: api for updating the board field except members,list
 router.put(ID + UPDATE, async (req: Request, res: Response) => {
   try {
     const boardId = req.params.id;
@@ -129,6 +129,45 @@ router.put(ID + UPDATE, async (req: Request, res: Response) => {
       },
     });
     res.status(OK).json({ status: OK, message: status[OK] });
+  } catch (err) {
+    if (err instanceof ZodError) {
+      console.error("Validation error:", err.errors);
+      res.status(BAD_REQUEST).json({
+        status: BAD_REQUEST,
+        message: status[BAD_REQUEST],
+      });
+    } else {
+      console.log(err);
+      res.status(INTERNAL_SERVER_ERROR).json({
+        status: INTERNAL_SERVER_ERROR,
+        message: status[INTERNAL_SERVER_ERROR],
+      });
+    }
+  }
+});
+
+//TODO: api for getting the board members which can later be used in cards
+router.get(ID + GET + MEMBERS, async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const users = await prisma.board.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        members: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+      },
+    });
+    res
+      .status(OK)
+      .json({ status: OK, message: status[OK], members: users?.members });
   } catch (err) {
     if (err instanceof ZodError) {
       console.error("Validation error:", err.errors);

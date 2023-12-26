@@ -45,7 +45,7 @@ router.put(ID + UPDATE, async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     const listUpdateRequest = ListNameUpdateSchema.parse(req.body);
-    await prisma.list.update({
+    const list = await prisma.list.update({
       where: {
         id,
       },
@@ -55,7 +55,7 @@ router.put(ID + UPDATE, async (req: Request, res: Response) => {
     });
     res
       .status(OK)
-      .json({ status: OK, message: "List name updated successfully" });
+      .json({ status: OK, message: "List name updated successfully", list });
   } catch (err) {
     if (err instanceof ZodError) {
       console.error("Validation error:", err.errors);

@@ -9,6 +9,8 @@ export const LOGIN = "/login";
 export const NAME = "/name";
 export const ID = "/:id";
 export const ME = "/me";
+export const ALL = "/all";
+export const MEMBERS = "/members";
 
 export const CREATE = "/create";
 export const GET = "/get";
