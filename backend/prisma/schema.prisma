@@ -11,16 +11,16 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(uuid())
-  email        String    @unique
-  password     String
-  firstName    String
-  lastName     String
-  signupDate   DateTime  @default(now())
-  memberBoards Board[]   @relation(name: "member_relation")
-  ownerBoards  Board[]   @relation(name: "owner_relation")
-  cards        Card[]
-  Comment      Comment[]
+  id          String    @id @default(uuid())
+  email       String    @unique
+  password    String
+  firstName   String
+  lastName    String
+  signupDate  DateTime  @default(now())
+  boards      Board[]   @relation(name: "member_relation")
+  ownerBoards Board[]   @relation(name: "owner_relation")
+  cards       Card[]
+  Comment     Comment[]
 }
 
 model Board {

@@ -19,7 +19,6 @@ export const authenticateToken = (
   let claims;
   try {
     claims = verifyToken(token);
-    console.log(claims);
   } catch (err) {
     console.log(err);
     return res

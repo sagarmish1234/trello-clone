@@ -1,6 +1,6 @@
 import { Router } from "express";
 import prisma from "../db";
-import { CREATE, LOGIN } from "../constant";
+import { CREATE, LOGIN, ME } from "../constant";
 import {
   UserClaims,
   UserClaimsSchema,
@@ -10,7 +10,10 @@ import {
 import { Request, Response } from "express";
 import { error } from "console";
 import { ZodError } from "zod";
+import status, { INTERNAL_SERVER_ERROR, OK, UNAUTHORIZED } from "http-status";
 import { encodeText, generateToken, isPasswordMaching } from "../util/jwt";
+import { CustomRequest } from "../types/common";
+import { authenticateToken } from "../middleware";
 
 const router = Router();
 
@@ -70,11 +73,11 @@ router.post(LOGIN, async (req: Request, res: Response) => {
       (await isPasswordMaching(user.password, userLoginRequest.password))
     ) {
       token = generateToken(user as UserClaims);
-      res
-        .status(200)
-        .json({ status: 200, token, claims: UserClaimsSchema.parse(user) });
+      res.status(200).json({ status: 200, token });
     } else {
-      res.status(401).json({ status: 401, message: "Invalid credentials" });
+      res
+        .status(UNAUTHORIZED)
+        .json({ status: UNAUTHORIZED, message: "Invalid credentials" });
     }
   } catch (err) {
     if (error instanceof ZodError) {
@@ -85,12 +88,20 @@ router.post(LOGIN, async (req: Request, res: Response) => {
       });
     } else {
       console.log(error);
-      res.status(500).json({
-        status: 500,
-        message: "Internal server error",
+      res.status(INTERNAL_SERVER_ERROR).json({
+        status: INTERNAL_SERVER_ERROR,
+        message: status[INTERNAL_SERVER_ERROR],
       });
     }
   }
+});
+
+//TODO: api for fetching the user from token
+router.get(ME, authenticateToken, async (req: Request, res: Response) => {
+  const claims = (req as CustomRequest).claims;
+  res
+    .status(OK)
+    .json({ status: status[OK], claims: UserClaimsSchema.parse(claims) });
 });
 
 export default router;

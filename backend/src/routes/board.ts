@@ -1,11 +1,12 @@
 import { Request, Response, Router } from "express";
 import prisma from "../db";
-import { CREATE, ID, NAME, UPDATE } from "../constant";
+import { CREATE, GET, ID, ME, NAME, UPDATE } from "../constant";
 import { ZodError } from "zod";
 import status, {
   BAD_REQUEST,
   CREATED,
   INTERNAL_SERVER_ERROR,
+  OK,
 } from "http-status";
 import { CustomRequest } from "../types/common";
 import { BoardSchema } from "../types/board";
@@ -46,6 +47,69 @@ router.post(CREATE, async (req: Request, res: Response) => {
   }
 });
 
+//TODO: API for fetching the board with list and cards
+
+router.get(ID, async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const board = await prisma.board.findUnique({
+      where: {
+        id: id,
+      },
+      include: {
+        owner: {
+          select: {
+            id: true,
+            email: true,
+          },
+        },
+      },
+    });
+    res.status(OK).json({ status: OK, board: board });
+  } catch (err) {
+    if (err instanceof ZodError) {
+      res.status(BAD_REQUEST).json({
+        status: BAD_REQUEST,
+        message: status[BAD_REQUEST],
+      });
+    } else {
+      res.status(INTERNAL_SERVER_ERROR).json({
+        status: INTERNAL_SERVER_ERROR,
+        message: status[INTERNAL_SERVER_ERROR],
+      });
+    }
+  }
+});
+
+//TODO: API for fetching boards of the current logged in user
+router.get(ME + GET, async (req: Request, res: Response) => {
+  try {
+    const ownerId = ((req as CustomRequest).claims as UserClaims).id;
+    const boards = await prisma.board.findMany({
+      where: {
+        ownerId: ownerId,
+      },
+    });
+
+    console.log(boards);
+    res.status(OK).json({ status: OK, message: "Some message", boards });
+  } catch (err) {
+    if (err instanceof ZodError) {
+      console.error("Validation error:", err.errors);
+      res.status(BAD_REQUEST).json({
+        status: BAD_REQUEST,
+        message: status[BAD_REQUEST],
+      });
+    } else {
+      console.log(err);
+      res.status(INTERNAL_SERVER_ERROR).json({
+        status: INTERNAL_SERVER_ERROR,
+        message: status[INTERNAL_SERVER_ERROR],
+      });
+    }
+  }
+});
+
 //TODO: api for updating the board name
 router.put(ID + UPDATE, async (req: Request, res: Response) => {
   try {
@@ -59,6 +123,7 @@ router.put(ID + UPDATE, async (req: Request, res: Response) => {
         name: boardUpdateNameRequest.name,
       },
     });
+    res.status(OK).json({ status: OK, message: status[OK] });
   } catch (err) {
     if (err instanceof ZodError) {
       console.error("Validation error:", err.errors);
