@@ -1,6 +1,16 @@
 import { Request, Response, Router } from "express";
 import prisma from "../db";
-import { CREATE, GET, ID, ME, MEMBERS, UPDATE } from "../constant";
+import {
+  ADD,
+  CREATE,
+  GET,
+  ID,
+  ME,
+  MEMBER,
+  MEMBERS,
+  REMOVE,
+  UPDATE,
+} from "../constant";
 import { ZodError } from "zod";
 import status, {
   BAD_REQUEST,
@@ -9,7 +19,7 @@ import status, {
   OK,
 } from "http-status";
 import { CustomRequest } from "../types/common";
-import { BoardSchema } from "../types/board";
+import { BoardMemberUpdateSchema, BoardSchema } from "../types/board";
 import { UserClaims } from "../types/user";
 
 const router = Router();
@@ -185,4 +195,69 @@ router.get(ID + GET + MEMBERS, async (req: Request, res: Response) => {
   }
 });
 
+//TODO: api for adding the member in board
+router.put(ID + ADD + MEMBER, async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const member = BoardMemberUpdateSchema.parse(req.body).member;
+    const board = await prisma.board.update({
+      where: {
+        id,
+      },
+      data: {
+        members: {
+          connect: [{ id: member }],
+        },
+      },
+    });
+    res.status(OK).json({ status: OK, message: status[OK], board });
+  } catch (err) {
+    if (err instanceof ZodError) {
+      console.error("Validation error:", err.errors);
+      res.status(BAD_REQUEST).json({
+        status: BAD_REQUEST,
+        message: status[BAD_REQUEST],
+      });
+    } else {
+      console.log(err);
+      res.status(INTERNAL_SERVER_ERROR).json({
+        status: INTERNAL_SERVER_ERROR,
+        message: status[INTERNAL_SERVER_ERROR],
+      });
+    }
+  }
+});
+
+//TODO: api for removing the member in board
+router.put(ID + REMOVE + MEMBER, async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const member = BoardMemberUpdateSchema.parse(req.body).member;
+    const board = await prisma.board.update({
+      where: {
+        id,
+      },
+      data: {
+        members: {
+          disconnect: [{ id: member }],
+        },
+      },
+    });
+    res.status(OK).json({ status: OK, message: status[OK], board });
+  } catch (err) {
+    if (err instanceof ZodError) {
+      console.error("Validation error:", err.errors);
+      res.status(BAD_REQUEST).json({
+        status: BAD_REQUEST,
+        message: status[BAD_REQUEST],
+      });
+    } else {
+      console.log(err);
+      res.status(INTERNAL_SERVER_ERROR).json({
+        status: INTERNAL_SERVER_ERROR,
+        message: status[INTERNAL_SERVER_ERROR],
+      });
+    }
+  }
+});
 export default router;

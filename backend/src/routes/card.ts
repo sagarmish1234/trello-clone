@@ -1,5 +1,14 @@
 import { Request, Response, Router } from "express";
-import { CREATE, GET, ID, MEMBERS, UPDATE } from "../constant";
+import {
+  ADD,
+  CREATE,
+  GET,
+  ID,
+  MEMBER,
+  MEMBERS,
+  REMOVE,
+  UPDATE,
+} from "../constant";
 import { ZodError } from "zod";
 import status, {
   BAD_REQUEST,
@@ -124,8 +133,8 @@ router.put(ID + UPDATE, async (req: Request, res: Response) => {
   }
 });
 
-//TODO: api for updating card members
-router.put(ID + UPDATE + MEMBERS, async (req: Request, res: Response) => {
+//TODO: api for updating card member
+router.put(ID + ADD + MEMBER, async (req: Request, res: Response) => {
   try {
     const member = CardMemberUpdateSchema.parse(req.body).member;
     const id = req.params.id;
@@ -136,6 +145,39 @@ router.put(ID + UPDATE + MEMBERS, async (req: Request, res: Response) => {
       data: {
         members: {
           connect: [{ id: member }],
+        },
+      },
+    });
+    res.status(OK).json({ stutus: OK, message: status[OK], card });
+  } catch (err) {
+    if (err instanceof ZodError) {
+      console.error("Validation error:", err.errors);
+      res.status(BAD_REQUEST).json({
+        status: BAD_REQUEST,
+        message: status[BAD_REQUEST],
+      });
+    } else {
+      console.log(err);
+      res.status(INTERNAL_SERVER_ERROR).json({
+        status: INTERNAL_SERVER_ERROR,
+        message: status[INTERNAL_SERVER_ERROR],
+      });
+    }
+  }
+});
+
+//TODO: api for removing the member from card
+router.put(ID + REMOVE + MEMBER, async (req: Request, res: Response) => {
+  try {
+    const member = CardMemberUpdateSchema.parse(req.body).member;
+    const id = req.params.id;
+    const card = await prisma.card.update({
+      where: {
+        id,
+      },
+      data: {
+        members: {
+          disconnect: [{ id: member }],
         },
       },
     });

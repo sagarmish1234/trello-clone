@@ -11,8 +11,11 @@ export const ID = "/:id";
 export const ME = "/me";
 export const ALL = "/all";
 export const MEMBERS = "/members";
+export const MEMBER = "/member";
 
 export const CREATE = "/create";
 export const GET = "/get";
 export const UPDATE = "/update";
 export const DELETE = "/delete";
+export const ADD = "/add";
+export const REMOVE = "/remove";
